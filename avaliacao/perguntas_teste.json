@@ -1,0 +1,259 @@
+[
+  {
+    "id": "P01",
+    "pergunta": "Qual é o prazo para cancelar a compra de um ingresso e ter direito ao reembolso?",
+    "tem_resposta": true,
+    "documentos": [
+      "01_cancelar_ingressos_e_reembolso.md",
+      "03_cancelar_compra_evento_online_ou_presencial.md",
+      "04_politica_de_reembolso_organizador.md",
+      "05_politica_de_cancelamento_de_pedidos.md"
+    ],
+    "evidencias": [
+      "até 7 dias corridos a partir da data da compra",
+      "em até 7 (sete) dias corridos após a data da compra",
+      "até 7 (sete) dias corridos contados da data da compra",
+      "até 7 (sete) dias corridos a contar da data da compra"
+    ],
+    "resposta_esperada": "Até 7 dias corridos a partir da data da compra (direito de arrependimento do CDC); recomenda-se pedir com 48 horas de antecedência do evento."
+  },
+  {
+    "id": "P02",
+    "pergunta": "Comprei 3 ingressos no mesmo pedido. Posso cancelar só um deles?",
+    "tem_resposta": true,
+    "documentos": [
+      "01_cancelar_ingressos_e_reembolso.md",
+      "02_como_funciona_o_reembolso.md",
+      "03_cancelar_compra_evento_online_ou_presencial.md"
+    ],
+    "evidencias": [
+      "Não é possível cancelar apenas um ingresso de um pedido com múltiplos ingressos",
+      "A Sympla não realiza reembolso parcial"
+    ],
+    "resposta_esperada": "Não. O cancelamento é sempre do pedido inteiro; todos os ingressos do pedido são reembolsados."
+  },
+  {
+    "id": "P03",
+    "pergunta": "Consigo cancelar meu pedido pelo aplicativo da Sympla?",
+    "tem_resposta": true,
+    "documentos": [
+      "01_cancelar_ingressos_e_reembolso.md"
+    ],
+    "evidencias": [
+      "A função não está disponível no aplicativo"
+    ],
+    "resposta_esperada": "Não. O cancelamento deve ser feito pelo site, em Meus Ingressos > Cancelar Pedido."
+  },
+  {
+    "id": "P04",
+    "pergunta": "Paguei com Pix e cancelei a compra. Em quanto tempo recebo o dinheiro de volta?",
+    "tem_resposta": true,
+    "documentos": [
+      "02_como_funciona_o_reembolso.md"
+    ],
+    "evidencias": [
+      "em até 7 dias contados a partir da data de cancelamento da compra"
+    ],
+    "resposta_esperada": "Se o cancelamento for até 90 dias da compra, a devolução é automática para a mesma conta em até 7 dias; após 90 dias, por transferência após cadastrar dados bancários."
+  },
+  {
+    "id": "P05",
+    "pergunta": "Como recebo o reembolso de uma compra no cartão se o cancelamento acontecer mais de 180 dias depois da compra?",
+    "tem_resposta": true,
+    "documentos": [
+      "02_como_funciona_o_reembolso.md"
+    ],
+    "evidencias": [
+      "Caso o cancelamento do pedido ocorra após 180 dias da compra"
+    ],
+    "resposta_esperada": "O reembolso é feito via conta bancária; é preciso cadastrar os dados bancários com o atendimento."
+  },
+  {
+    "id": "P06",
+    "pergunta": "Qual a diferença entre a taxa de serviço e a taxa de processamento?",
+    "tem_resposta": true,
+    "documentos": [
+      "06_taxas_na_compra_de_ingressos.md"
+    ],
+    "evidencias": [
+      "Taxa de processamento: Relacionada aos custos de processamento da transação financeira"
+    ],
+    "resposta_esperada": "A taxa de serviço cobre a operação da plataforma e os serviços da Sympla; a de processamento cobre os custos da transação financeira com o meio de pagamento e é devida pelo comprador."
+  },
+  {
+    "id": "P07",
+    "pergunta": "Até quando posso trocar o nome do titular do ingresso?",
+    "tem_resposta": true,
+    "documentos": [
+      "07_troca_de_titularidade.md"
+    ],
+    "evidencias": [
+      "A troca de titularidade é desabilitada 24 horas antes do início do evento"
+    ],
+    "resposta_esperada": "Até 24 horas antes do início do evento (ou conforme prazo do organizador)."
+  },
+  {
+    "id": "P08",
+    "pergunta": "A Sympla cobra alguma coisa para trocar a titularidade do ingresso?",
+    "tem_resposta": true,
+    "documentos": [
+      "07_troca_de_titularidade.md"
+    ],
+    "evidencias": [
+      "não existe nenhum custo adicional cobrado pela Sympla"
+    ],
+    "resposta_esperada": "Não, a troca de titularidade é gratuita."
+  },
+  {
+    "id": "P09",
+    "pergunta": "Pedi a troca de titularidade ao organizador. Quanto tempo ele tem para responder?",
+    "tem_resposta": true,
+    "documentos": [
+      "07_troca_de_titularidade.md"
+    ],
+    "evidencias": [
+      "O organizador tem até 48 horas úteis para responder"
+    ],
+    "resposta_esperada": "Até 48 horas úteis; se não responder, é possível pedir mediação da Sympla."
+  },
+  {
+    "id": "P10",
+    "pergunta": "Qual o valor máximo que o Seguro Reembolso Garantido devolve?",
+    "tem_resposta": true,
+    "documentos": [
+      "08_seguro_reembolso_garantido.md"
+    ],
+    "evidencias": [
+      "limitado a R$ 10.000 por participante"
+    ],
+    "resposta_esperada": "O valor nominal do ingresso, limitado a R$ 10.000 por participante (taxas não são reembolsadas)."
+  },
+  {
+    "id": "P11",
+    "pergunta": "Posso contratar o Seguro Reembolso Garantido depois de finalizar a compra?",
+    "tem_resposta": true,
+    "documentos": [
+      "08_seguro_reembolso_garantido.md"
+    ],
+    "evidencias": [
+      "Após a conclusão da compra, não é possível adicionar o seguro ao pedido"
+    ],
+    "resposta_esperada": "Não, o seguro só pode ser contratado durante a compra."
+  },
+  {
+    "id": "P12",
+    "pergunta": "Em quantas vezes posso parcelar no cartão e quanto é o juro?",
+    "tem_resposta": true,
+    "documentos": [
+      "10_parcelamento_cartao_de_credito.md"
+    ],
+    "evidencias": [
+      "acrescido de juros de 3.49% ao mês"
+    ],
+    "resposta_esperada": "Em até 12x, com juros de 3,49% ao mês (compostos) e parcela mínima de R$ 5,00."
+  },
+  {
+    "id": "P13",
+    "pergunta": "Posso pagar meu ingresso com o cartão iFood Benefícios?",
+    "tem_resposta": true,
+    "documentos": [
+      "09_formas_de_pagamento.md"
+    ],
+    "evidencias": [
+      "saldo disponível nas modalidades Cultura ou Saldo Livre"
+    ],
+    "resposta_esperada": "Sim, se o evento aceitar e houver saldo nas modalidades Cultura ou Saldo Livre."
+  },
+  {
+    "id": "P14",
+    "pergunta": "Paguei com cartão de crédito e o ingresso ainda não apareceu. Quanto tempo demora?",
+    "tem_resposta": true,
+    "documentos": [
+      "11_como_acessar_meus_ingressos.md"
+    ],
+    "evidencias": [
+      "Cartão de crédito: o prazo é de até 72 horas úteis"
+    ],
+    "resposta_esperada": "Até 72 horas úteis (a compra pode estar em análise de segurança)."
+  },
+  {
+    "id": "P15",
+    "pergunta": "Existe limite de ingressos de meia-entrada para idosos?",
+    "tem_resposta": true,
+    "documentos": [
+      "18_meia_entrada.md"
+    ],
+    "evidencias": [
+      "sem qualquer limitação de quantidade"
+    ],
+    "resposta_esperada": "Não. Idosos (60+) têm 50% de desconto sem limite de quantidade, diferente do limite de 40% para estudantes e PCD."
+  },
+  {
+    "id": "P16",
+    "pergunta": "Que documento o estudante precisa apresentar para ter meia-entrada?",
+    "tem_resposta": true,
+    "documentos": [
+      "18_meia_entrada.md"
+    ],
+    "evidencias": [
+      "CIE – Carteira de Identificação Estudantil"
+    ],
+    "resposta_esperada": "A CIE (Carteira de Identificação Estudantil), apresentada no dia do evento."
+  },
+  {
+    "id": "P17",
+    "pergunta": "Se eu excluir minha conta na Sympla, perco acesso aos meus ingressos?",
+    "tem_resposta": true,
+    "documentos": [
+      "14_excluir_conta.md"
+    ],
+    "evidencias": [
+      "você perderá o acesso aos ingressos e conteúdos adquiridos"
+    ],
+    "resposta_esperada": "Sim, perde o acesso aos ingressos e ao histórico vinculados ao e-mail da conta excluída."
+  },
+  {
+    "id": "P18",
+    "pergunta": "Em quanto tempo o atendimento da Sympla responde?",
+    "tem_resposta": true,
+    "documentos": [
+      "15_como_falar_com_a_sympla.md"
+    ],
+    "evidencias": [
+      "O time de atendimento dá um retorno em até 1 dia útil"
+    ],
+    "resposta_esperada": "Em até 1 dia útil, por formulário, chat ou redes sociais."
+  },
+  {
+    "id": "P19",
+    "pergunta": "Qual é o número de telefone do SAC da Sympla para eu ligar?",
+    "tem_resposta": false,
+    "documentos": [],
+    "evidencias": [],
+    "resposta_esperada": "Não encontrei essa informação nos documentos da Sympla."
+  },
+  {
+    "id": "P20",
+    "pergunta": "Quanto custa, em reais, a taxa de serviço da Sympla em um ingresso de R$ 100?",
+    "tem_resposta": false,
+    "documentos": [],
+    "evidencias": [],
+    "resposta_esperada": "Não encontrei essa informação nos documentos da Sympla."
+  },
+  {
+    "id": "P21",
+    "pergunta": "Quem é o CEO da Sympla?",
+    "tem_resposta": false,
+    "documentos": [],
+    "evidencias": [],
+    "resposta_esperada": "Não encontrei essa informação nos documentos da Sympla."
+  },
+  {
+    "id": "P22",
+    "pergunta": "A Sympla tem bilheteria física para comprar ingresso em dinheiro?",
+    "tem_resposta": false,
+    "documentos": [],
+    "evidencias": [],
+    "resposta_esperada": "Não encontrei essa informação nos documentos da Sympla."
+  }
+]

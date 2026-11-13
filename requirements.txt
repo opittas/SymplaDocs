@@ -1,0 +1,14 @@
+# Embeddings e banco vetorial
+sentence-transformers>=3.0
+chromadb>=0.5
+numpy
+pyyaml
+# Geração (Ollama é acessado via HTTP; transformers é usado no Colab)
+requests
+transformers>=4.44
+accelerate
+torch
+# Interface web opcional para a demonstração
+gradio>=4.0
+# Usado apenas no embedder de teste offline
+scikit-learn
