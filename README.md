@@ -7,7 +7,7 @@ Trabalho da **Atividade 4 – Tecnologias Emergentes (PUC-Campinas)**. Sistema R
 ## Como funciona
 
 ```
-docs/*.md ──► chunking (600 car., overlap 100) ──► embeddings multilíngues ──► Chroma
+docs/*.md ──► chunking (1000 car., overlap 150) ──► embeddings multilíngues ──► Chroma
                                                                                  │
 pergunta ──► embedding ──► top-k (k=3) por similaridade de cosseno ──► limiar ───┤
                                                                                  ▼
@@ -18,10 +18,10 @@ pergunta ──► embedding ──► top-k (k=3) por similaridade de cosseno �
 | Etapa | Escolha |
 |---|---|
 | Documentos | 18 artigos da Central de Ajuda da Sympla em Markdown, com URL e data (`docs/`) |
-| Chunking | por parágrafos, 600 caracteres com 100 de sobreposição; título e seção vão junto no embedding |
-| Embeddings | `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` (gratuito, multilíngue) |
+| Chunking | por parágrafos, 1000 caracteres com 150 de sobreposição (melhor MRR entre 300, 600 e 1000); título e seção vão junto no embedding |
+| Embeddings | `intfloat/multilingual-e5-small` (gratuito, multilíngue; venceu o MiniLM multilíngue na avaliação) |
 | Banco vetorial | Chroma (persistente, distância de cosseno) |
-| Recuperação | top-k = 3 com limiar mínimo de similaridade (padrão 0,40; calibrado na avaliação) |
+| Recuperação | top-k = 3 com limiar mínimo de similaridade de 0,89 (calibrado na avaliação) |
 | LLM | Ollama local (`qwen2.5:3b`) ou `Qwen/Qwen2.5-1.5B-Instruct` via transformers no Google Colab |
 | Interfaces | linha de comando (`perguntar.py`), app web Gradio (`app.py`) e notebook do Colab |
 
@@ -78,10 +78,13 @@ Sem GPU nem Ollama, dá para testar só a recuperação: `python perguntar.py --
 
 ### Avaliação
 
+No Colab, `bash avaliacao/rodar_tudo.sh` roda tudo de uma vez: compara os modelos e os tamanhos de chunk, escolhe o limiar e avalia as respostas do LLM.
+
+
 ```bash
 python avaliacao/avaliar.py                    # compara chunks de 300, 600 e 1000 caracteres
 python avaliacao/avaliar.py --gerar            # também gera e confere as respostas do LLM
-python avaliacao/avaliar.py --limiar 0.45      # testa outro limiar
+python avaliacao/avaliar.py --limiar 0.85      # testa outro limiar
 python avaliacao/avaliar.py --embeddings sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 intfloat/multilingual-e5-small
 ```
 
@@ -93,10 +96,10 @@ Tudo pode ser alterado por variável de ambiente ou argumento de linha de comand
 
 | Variável | Padrão | O que é |
 |---|---|---|
-| `RAG_EMBEDDINGS` | paraphrase-multilingual-MiniLM-L12-v2 | modelo de embeddings |
-| `RAG_CHUNK` / `RAG_OVERLAP` | 600 / 100 | tamanho do trecho e sobreposição (caracteres) |
+| `RAG_EMBEDDINGS` | intfloat/multilingual-e5-small | modelo de embeddings |
+| `RAG_CHUNK` / `RAG_OVERLAP` | 1000 / 150 | tamanho do trecho e sobreposição (caracteres) |
 | `RAG_TOP_K` | 3 | quantos trechos recuperar |
-| `RAG_LIMIAR` | 0.40 | similaridade mínima para usar um trecho |
+| `RAG_LIMIAR` | 0.89 | similaridade mínima para usar um trecho |
 | `RAG_LLM` | ollama | `ollama` ou `hf` |
 | `RAG_MODELO_OLLAMA` | qwen2.5:3b | modelo do Ollama |
 | `RAG_MODELO_HF` | Qwen/Qwen2.5-1.5B-Instruct | modelo do transformers |

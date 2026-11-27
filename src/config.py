@@ -22,13 +22,13 @@ MODELO_EMBEDDINGS = os.getenv(
 )
 
 # Chunking: tamanho em caracteres e sobreposição. Tamanhos testados na avaliação.
-TAMANHO_CHUNK = int(os.getenv("RAG_CHUNK", 600))
-SOBREPOSICAO = int(os.getenv("RAG_OVERLAP", 100))
+TAMANHO_CHUNK = int(os.getenv("RAG_CHUNK", 1000))
+SOBREPOSICAO = int(os.getenv("RAG_OVERLAP", 150))
 CONFIGS_CHUNK = [(300, 60), (600, 100), (1000, 150)]
 
 # Recuperação: k trechos mais próximos e limiar mínimo de similaridade (cosseno).
 TOP_K = int(os.getenv("RAG_TOP_K", 3))
-LIMIAR_SIMILARIDADE = float(os.getenv("RAG_LIMIAR", 0.40))
+LIMIAR_SIMILARIDADE = float(os.getenv("RAG_LIMIAR", 0.89))
 
 # Geração: "ollama" (local) ou "hf" (transformers, ideal para o Google Colab).
 BACKEND_LLM = os.getenv("RAG_LLM", "ollama")

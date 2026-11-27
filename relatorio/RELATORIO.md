@@ -3,7 +3,7 @@
 **Disciplina:** Tecnologias Emergentes – PUC-Campinas · **Atividade 4**
 **Dupla:** Lucas ______ e ______ · **Data:** novembro de 2026
 
-> Os trechos marcados com **[PREENCHER]** dependem dos números gerados ao rodar `avaliacao/avaliar.py` no Colab (arquivo `avaliacao/resultados/resultados.md`).
+> Todos os números deste relatório vêm de uma execução real no Google Colab (CPU, 27/11/2026) com `bash avaliacao/rodar_tudo.sh`. As saídas completas estão em `avaliacao/resultados/`.
 
 ## 1. Problema e usuário
 
@@ -30,13 +30,13 @@ A lista completa com links está no README.
 ```mermaid
 flowchart LR
     subgraph Ingestão
-        D[18 artigos .md<br/>título, URL, data] --> C[Chunking<br/>600 car. / overlap 100]
-        C --> E1[Embeddings<br/>MiniLM multilíngue]
+        D[18 artigos .md<br/>título, URL, data] --> C[Chunking<br/>1000 car. / overlap 150]
+        C --> E1[Embeddings<br/>multilingual-e5-small]
         E1 --> V[(Chroma<br/>cosseno)]
     end
     subgraph Consulta
         P[Pergunta do usuário] --> E2[Embedding da pergunta]
-        E2 --> R{Top-k = 3<br/>similaridade ≥ limiar?}
+        E2 --> R{Top-k = 3<br/>similaridade ≥ 0,89?}
         V --> R
         R -- não --> N[“Não encontrei essa informação<br/>nos documentos da Sympla.”]
         R -- sim --> PR[Prompt: responder só com o contexto,<br/>citar a fonte, admitir quando não sabe]
@@ -52,7 +52,23 @@ Interfaces: linha de comando (`perguntar.py`), app web em Gradio (`app.py`) e no
 ## 4. Escolhas técnicas e justificativas
 
 ### 4.1 Modelo de embeddings
-`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`: gratuito, treinado em mais de 50 idiomas (inclui português), pequeno (~120 MB, 384 dimensões) e rápido em CPU, o que permite rodar no Colab gratuito e no notebook de um aluno. O script também aceita `intfloat/multilingual-e5-small` para comparação (o código adiciona os prefixos `query:`/`passage:` que a família E5 exige). **[PREENCHER se rodarem a comparação.]**
+Comparamos dois modelos gratuitos e multilíngues, ambos pequenos o bastante para rodar em CPU no Colab gratuito:
+
+- `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` (384 dimensões, treinado para paráfrases em mais de 50 idiomas);
+- `intfloat/multilingual-e5-small` (384 dimensões, treinado para busca: pergunta → passagem). O código adiciona automaticamente os prefixos `query:` e `passage:` que a família E5 exige.
+
+| Modelo | Chunk | P@3 | Hit@3 | MRR |
+|---|---|---|---|---|
+| MiniLM-L12 | 300 / 60 | 29,6% | 72,2% | 0,562 |
+| MiniLM-L12 | 600 / 100 | 25,9% | 66,7% | 0,569 |
+| MiniLM-L12 | 1000 / 150 | 25,9% | 66,7% | 0,565 |
+| **e5-small** | 300 / 60 | 29,6% | 77,8% | 0,613 |
+| **e5-small** | 600 / 100 | **46,3%** | **88,9%** | 0,759 |
+| **e5-small** | **1000 / 150** | 44,4% | **88,9%** | **0,796** |
+
+(Métricas calculadas sobre as 18 perguntas que têm resposta na base.)
+
+**Escolha: `multilingual-e5-small`.** Ele ganhou em todas as configurações de chunk. A diferença faz sentido: o MiniLM foi treinado para medir se duas frases dizem a mesma coisa, enquanto o E5 foi treinado justamente para ligar uma pergunta curta a um trecho que a responde, que é o caso do RAG. Com o MiniLM em chunks de 600 ou 1000, em um terço das perguntas nenhum dos 3 trechos recuperados continha a resposta.
 
 ### 4.2 Banco vetorial
 Chroma: roda embutido no Python, sem servidor, persiste em disco e suporta distância de cosseno. Para 18 documentos (~110 trechos) é mais que suficiente.
@@ -68,17 +84,30 @@ Foram testados três tamanhos (sobreposição de ~15–20%):
 | 600 car. / overlap 100 | 110 | 466 car. |
 | 1000 car. / overlap 150 | 62 | 789 car. |
 
-**[PREENCHER com a tabela de P@k, Hit@k e MRR de `resultados.md`.]**
+Resultado com o modelo escolhido (e5-small), incluindo k = 1 e k = 5:
 
-Justificativa da escolha (ajustar conforme os números): trechos de 300 caracteres separam bem as regras, mas muitas vezes cortam a pergunta da resposta (nas FAQs, a pergunta fica num trecho e a resposta no outro) e o LLM recebe pouco contexto. Trechos de 1000 caracteres misturam vários assuntos do mesmo artigo (por exemplo, prazo de troca e custo da troca juntos), o que dilui o embedding e gasta mais contexto do LLM. **600 caracteres** costuma ficar no meio: um trecho cobre uma regra completa com o contexto ao redor. **[Confirmar com o resultado: escolher a configuração com maior MRR/Hit@3.]**
+| Chunk | Hit@1 | Hit@3 | Hit@5 | P@3 | MRR |
+|---|---|---|---|---|---|
+| 300 / 60 | 44,4% | 77,8% | 83,3% | 29,6% | 0,613 |
+| 600 / 100 | 66,7% | 88,9% | 88,9% | 46,3% | 0,759 |
+| 1000 / 150 | **72,2%** | 88,9% | 88,9% | 44,4% | **0,796** |
+
+**Escolha: 1000 caracteres com sobreposição de 150.** Os trechos de 300 caracteres foram claramente piores (Hit@3 de 77,8%): nas FAQs da Sympla a pergunta e a resposta muitas vezes ficam em trechos diferentes, e o trecho recuperado "parece" certo mas não contém a regra. Entre 600 e 1000 o Hit@3 empatou (16 de 18 perguntas), e o 600 teve P@3 um pouco maior porque a mesma regra aparece em mais de um trecho com sobreposição. Ficamos com 1000 porque teve o **maior MRR (0,796)** e o maior Hit@1 (72,2% contra 66,7%): o trecho certo aparece mais vezes na 1ª posição, que é o que mais pesa para um LLM pequeno, que tende a se apoiar no primeiro trecho do contexto. O custo é um prompt maior (3 × ~800 caracteres), que o Qwen 1,5B/3B comporta sem problema. Com 62 trechos no total, a base continua pequena e a busca é instantânea.
 
 ### 4.4 Valor de k e limiar
 - **k = 3**: vários temas aparecem em mais de um artigo (o prazo de 7 dias está em 4 artigos), então trazer 3 trechos aumenta a chance de o certo estar presente, sem encher o prompt de um modelo pequeno.
-- **Limiar de similaridade**: o script testa limiares de 0,20 a 0,80 e escolhe o que melhor separa perguntas com resposta das sem resposta (acurácia balanceada). **[PREENCHER com o limiar sugerido e a tabela de similaridades.]** O limiar é a primeira barreira contra perguntas fora da base; a segunda é o prompt, que manda o LLM recusar quando o contexto não responde.
+- **Limiar de similaridade**: o script testa limiares de 0,20 a 0,95 e escolhe o que melhor separa perguntas com resposta das sem resposta (acurácia balanceada). O limiar escolhido foi **0,89** (acurácia balanceada de 84,7%).
+
+  | Similaridade do 1º trecho | Mínima | Máxima |
+  |---|---|---|
+  | 18 perguntas com resposta | 0,887 (P06) | 0,935 (P17) |
+  | 4 perguntas sem resposta | 0,848 (P21) | 0,900 (P20) |
+
+  Com 0,89, 17 das 18 perguntas com resposta passam e 3 das 4 sem resposta são barradas antes do LLM (P19, P21 e P22). Não existe limiar perfeito, porque as faixas se sobrepõem: P20 ("quanto custa a taxa em reais?") tem 0,900, mais que várias perguntas legítimas, já que o artigo de taxas fala exatamente de taxa de serviço, só que sem valores. Um ponto importante: o E5 gera similaridades comprimidas numa faixa estreita (quase tudo entre 0,85 e 0,94), por isso o limiar fica alto e qualquer diferença de 0,01 muda o resultado. Com o limiar inicial de 0,40 (pensado para o MiniLM), as 4 perguntas sem resposta passariam. O limiar é a primeira barreira contra perguntas fora da base; a segunda é o prompt, que manda o LLM recusar quando o contexto não responde.
 
 ### 4.5 LLM e prompt
 - **Local:** Ollama com `qwen2.5:3b` (roda em CPU com ~4 GB de RAM).
-- **Colab:** `Qwen/Qwen2.5-1.5B-Instruct` via transformers, em GPU T4 gratuita.
+- **Colab:** `Qwen/Qwen2.5-1.5B-Instruct` via transformers. Na nossa execução não havia GPU disponível no Colab gratuito, então tudo rodou em CPU (de 33 s a 140 s por resposta; com GPU T4 seriam poucos segundos).
 - A família Qwen2.5 foi escolhida por ser aberta, ter bom desempenho em português e seguir bem instruções em tamanhos pequenos. Temperatura baixa (0,1 / greedy) para respostas estáveis.
 - O prompt de sistema exige: (1) responder só com o contexto, sem inventar valores ou prazos; (2) citar a fonte no formato `Fonte: título (arquivo, data)`; (3) responder exatamente "Não encontrei essa informação nos documentos da Sympla." quando o contexto não tiver a resposta; (4) português, no máximo 4 frases.
 
@@ -91,15 +120,32 @@ Justificativa da escolha (ajustar conforme os números): trechos de 300 caracter
 - Perguntas sem resposta: verifica-se se o limiar descarta todos os trechos e, com `--gerar`, se o LLM responde que não encontrou.
 
 ### 5.2 Resultados
-**[PREENCHER: colar a tabela "Comparação das configurações" e o resumo "Respostas geradas pelo LLM" de `resultados.md`.]**
+**Recuperação** (e5-small, chunk 1000/150, k = 3, 18 perguntas com resposta): P@1 72,2%, P@3 44,4%, P@5 26,7%, Hit@1 72,2%, **Hit@3 88,9%**, Hit@5 88,9%, **MRR 0,796**. A tabela completa com os dois modelos e os três tamanhos de chunk está na seção 4.1 e em `avaliacao/resultados/comparacao_embeddings.md`.
+
+**Geração** (Qwen2.5-1.5B-Instruct, limiar 0,89, 22 perguntas). O script marca automaticamente se o sistema respondeu quando devia e recusou quando devia: **19/22**. Conferindo cada resposta contra a resposta esperada:
+
+| Resultado | Perguntas | Qtd. |
+|---|---|---|
+| Correta e completa | P01, P02, P05, P07, P09, P11, P12, P13, P14, P15, P16, P17, P18 | 13 |
+| Correta, mas incompleta | P04 (omitiu que a devolução automática no Pix vale só até 90 dias da compra) | 1 |
+| **Errada (alucinação)** | P03 | 1 |
+| **Recusa indevida** (havia resposta) | P06 (limiar), P08 e P10 (trecho certo não recuperado) | 3 |
+| Recusa correta (sem resposta na base) | P19, P21, P22 (pelo limiar, sem chamar o LLM) e P20 (o LLM recusou) | 4 |
+
+Ou seja, **18 de 22 (82%) comportamentos corretos** na conferência manual (o automático contou 19 porque não percebe que a resposta da P03 está errada) e **nenhuma alucinação nas perguntas sem resposta**. O erro mais comum do sistema é ser conservador demais (recusar), o que é preferível a inventar.
+
+Sobre a citação de fontes: o sistema sempre mostra os trechos recuperados (título, arquivo e data) junto com a resposta, mas o LLM só escreveu a linha "Fonte: …" pedida no prompt em 3 das 15 respostas (P04, P14 e P18). Um modelo de 1,5B não segue todas as regras do prompt com consistência; por isso a lista de fontes é montada pelo código, e não pelo LLM.
 
 ### 5.3 Análise de três erros
-**[PREENCHER com 3 casos reais da seção "Falhas" de `resultados.md`.]** Erros que esperamos encontrar, com base nos documentos (servem de guia):
 
-1. **Pergunta que pode ser respondida por inferência:** "A Sympla tem bilheteria física?" Nenhum artigo diz isso, mas trechos sobre "pontos de venda autorizados" ficam com similaridade alta e podem passar do limiar. Risco: o LLM deduzir uma resposta. Correção possível: endurecer o prompt, subir o limiar ou incluir um artigo que trate do tema.
-2. **Informação repetida em vários artigos:** o prazo de 7 dias aparece em 4 artigos com redação diferente, e a regra de "48 horas" aparece com dois sentidos (recomendação ao comprador e prazo do organizador para responder). O top-3 pode trazer só trechos sobre as 48 horas, e o LLM confundir os dois prazos.
-3. **Pergunta e resposta separadas pelo chunking:** nas FAQs ("Posso fazer mais de uma troca? Não. É permitida somente uma troca...") um chunk pequeno pode separar a pergunta da resposta. O trecho recuperado parece relevante, mas não contém a regra.
-4. **Vocabulário diferente:** o usuário fala "trocar o nome do ingresso" e o documento fala "titularidade"; o usuário fala "SAC" e o documento fala "atendimento". Embeddings multilíngues pequenos às vezes não aproximam esses termos.
+**Erro 1: P03 "Consigo cancelar meu pedido pelo aplicativo da Sympla?" (recuperação errada que virou alucinação).**
+A resposta certa está no artigo 01: "O cancelamento deve ser feito pelo site da Sympla. A função não está disponível no aplicativo." Mas o top-3 trouxe dois trechos do artigo 05 (*política de cancelamento de pedidos*, escrito para o **organizador**) e um trecho do artigo 01 sem essa frase. Os três trechos falam muito de "cancelamento de pedidos", então a similaridade foi alta (0,910) e passou do limiar. O LLM respondeu "Sim" e descreveu o caminho do painel do organizador ("Painel do evento", "Políticas do evento") como se fosse o app do comprador. Causa: o embedding captou o tema ("cancelar pedido"), mas não o detalhe que decide a resposta ("aplicativo"), e a base mistura artigos para comprador e para organizador. Correções: adicionar o público do artigo (comprador/organizador) nos metadados e filtrar por ele; usar um reranker (cross-encoder) depois do top-k; ou reforçar no prompt que o modelo deve responder "não sei" quando o contexto não mencionar o termo-chave da pergunta.
+
+**Erro 2: P08 "A Sympla cobra alguma coisa para trocar a titularidade?" (trecho certo fora do top-3).**
+A resposta está no fim do artigo 07: "Gratuidade: não existe nenhum custo adicional cobrado pela Sympla para realização de trocas de titularidade." O sistema recuperou os trechos #00, #01 e #02 do mesmo artigo (início do texto, sobre prazos e passo a passo), todos com similaridade alta (0,921), mas nenhum com a regra. O LLM, corretamente, disse que não encontrou, então não alucinou, mas deixou de responder algo que estava na base. Causa: com o título do artigo colocado na frente de todo trecho, os trechos do mesmo artigo ficam muito parecidos entre si, e o "desempate" é feito por palavras genéricas; a pergunta usa "cobra" e o texto usa "custo adicional" e "Gratuidade". A P10 (limite de R$ 10.000 do seguro) falhou pelo mesmo motivo: o 1º trecho foi a introdução do artigo do seguro. Correções: aumentar k para 5 quando os 3 primeiros vierem do mesmo artigo; busca híbrida (BM25 + embeddings), que acharia "custo"/"cobra"; ou chunks por seção/pergunta da FAQ.
+
+**Erro 3: P06 "Qual a diferença entre a taxa de serviço e a taxa de processamento?" (limiar rígido demais).**
+O artigo 06 explica as duas taxas, e o trecho certo foi recuperado em 2º lugar, mas a similaridade do melhor trecho foi 0,887, logo abaixo do limiar de 0,89. O sistema recusou sem nem chamar o LLM. Causa: o limiar foi escolhido para barrar as perguntas sem resposta, e a P22 (bilheteria física, 0,889) e a P20 (taxa em reais, 0,900) ficam na mesma faixa de similaridade das perguntas legítimas. Baixar o limiar para 0,88 salvaria a P06, mas deixaria passar a P22 e passaria a depender só do prompt para recusar. Correções: em vez de recusar direto abaixo do limiar, mandar ao LLM com uma instrução mais rígida (zona cinzenta entre 0,86 e 0,89); calibrar o limiar com mais perguntas de teste; ou usar o score de um reranker, que costuma separar melhor "relacionado" de "responde".
 
 ## 6. Limitações e riscos
 
@@ -113,7 +159,7 @@ Justificativa da escolha (ajustar conforme os números): trechos de 300 caracter
 
 ## 7. Divisão do trabalho na dupla
 
-**[PREENCHER]** Sugestão de divisão:
+*(A dupla deve conferir e ajustar esta divisão.)*
 
 | Integrante | Responsabilidades |
 |---|---|
