@@ -72,12 +72,12 @@ def avaliar_config(perguntas, embedder, tamanho, sobreposicao, limiar):
 
 
 def sugerir_limiar(linhas):
-    """Testa limiares de 0.20 a 0.80 e escolhe o que melhor separa perguntas com e
+    """Testa limiares de 0.20 a 0.95 e escolhe o que melhor separa perguntas com e
     sem resposta (acurácia balanceada; empate -> menor limiar, para recusar menos)."""
     com = [l["top1_sim"] for l in linhas if l["tem_resposta"]]
     sem = [l["top1_sim"] for l in linhas if not l["tem_resposta"]]
     melhor = None
-    for i in range(20, 81):
+    for i in range(20, 96):
         t = i / 100
         acc = (sum(s >= t for s in com) / len(com) + sum(s < t for s in sem) / len(sem)) / 2
         if melhor is None or acc > melhor[1]:

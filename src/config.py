@@ -18,7 +18,7 @@ PASTA_CHROMA = Path(os.getenv("RAG_CHROMA_DIR", RAIZ / "chroma_db"))
 
 # Modelo de embeddings multilíngue e gratuito (sentence-transformers / Hugging Face).
 MODELO_EMBEDDINGS = os.getenv(
-    "RAG_EMBEDDINGS", "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    "RAG_EMBEDDINGS", "intfloat/multilingual-e5-small"
 )
 
 # Chunking: tamanho em caracteres e sobreposição. Tamanhos testados na avaliação.
