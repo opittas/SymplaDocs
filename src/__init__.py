@@ -1,1 +1,1 @@
-"""Sistema RAG da Grão Norte (Atividade 4 – Tecnologias Emergentes)."""
+"""Sistema RAG da Central de Ajuda da Sympla (Atividade 4 – Tecnologias Emergentes)."""

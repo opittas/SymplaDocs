@@ -1,8 +1,8 @@
-"""Interface de linha de comando do assistente da Grão Norte.
+"""Interface de linha de comando do assistente da Sympla.
 
 Uso:
     python perguntar.py                            # modo interativo
-    python perguntar.py "Qual o prazo de troca?"   # uma pergunta só
+    python perguntar.py "Posso cancelar só um ingresso?"   # uma pergunta só
     python perguntar.py --llm hf                   # usa transformers em vez do Ollama
     python perguntar.py --sem-llm                  # mostra só os trechos recuperados
 """
@@ -25,7 +25,7 @@ def mostrar(resposta, detalhes: bool):
 
 
 def main():
-    p = argparse.ArgumentParser(description="Pergunte sobre as políticas da Grão Norte")
+    p = argparse.ArgumentParser(description="Pergunte sobre as políticas da Sympla")
     p.add_argument("pergunta", nargs="*")
     p.add_argument("--chunk", type=int, default=config.TAMANHO_CHUNK)
     p.add_argument("--overlap", type=int, default=config.SOBREPOSICAO)
@@ -43,7 +43,7 @@ def main():
     if a.pergunta:
         mostrar(rag.responder(" ".join(a.pergunta)), not a.quieto)
         return
-    print("Assistente Grão Norte ☕  (digite 'sair' para encerrar)\n")
+    print("Assistente Sympla 🎟️  (digite 'sair' para encerrar)\n")
     while True:
         try:
             pergunta = input("Pergunta: ").strip()
