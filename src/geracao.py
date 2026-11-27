@@ -51,16 +51,18 @@ class GeradorHF:
         self.tok = AutoTokenizer.from_pretrained(modelo)
         usa_gpu = torch.cuda.is_available()
         self.modelo = AutoModelForCausalLM.from_pretrained(
-            modelo, torch_dtype=torch.float16 if usa_gpu else torch.float32,
+            modelo, dtype=torch.float16 if usa_gpu else torch.float32,
             device_map="auto" if usa_gpu else None,
         )
 
     def gerar(self, mensagens: list[dict]) -> str:
-        entrada = self.tok.apply_chat_template(mensagens, add_generation_prompt=True, return_tensors="pt")
-        entrada = entrada.to(self.modelo.device)
-        saida = self.modelo.generate(entrada, max_new_tokens=300, do_sample=False,
+        entrada = self.tok.apply_chat_template(
+            mensagens, add_generation_prompt=True, return_tensors="pt", return_dict=True
+        ).to(self.modelo.device)
+        saida = self.modelo.generate(**entrada, max_new_tokens=300, do_sample=False,
                                      pad_token_id=self.tok.eos_token_id)
-        return self.tok.decode(saida[0][entrada.shape[-1]:], skip_special_tokens=True).strip()
+        n = entrada["input_ids"].shape[-1]
+        return self.tok.decode(saida[0][n:], skip_special_tokens=True).strip()
 
 
 def criar_gerador(backend: str = config.BACKEND_LLM):
